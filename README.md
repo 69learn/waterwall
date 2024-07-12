@@ -20,7 +20,7 @@
   
 - **ویدیوی آموزشی توسط 69**
 <div align="right">
-  <a href="https://www.youtube.com/watch?v=K1Qt4aBNrIE">
+  <a href="https://youtu.be/sn0-ABfIcx4">
     <img src="https://github.com/69learn/waterwall/blob/main/src/t.png" alt="Video Title" width="300">
   </a>
 </div>
