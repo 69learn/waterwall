@@ -21,7 +21,7 @@
 - **ویدیوی آموزشی توسط 69**
 <div align="right">
   <a href="https://www.youtube.com/watch?v=K1Qt4aBNrIE">
-    <img src="https://img.youtube.com/vi/K1Qt4aBNrIE/0.jpg" alt="Video Title" width="300">
+    <img src="https://github.com/69learn/waterwall/blob/main/src/t.png" alt="Video Title" width="300">
   </a>
 </div>
   </details>
