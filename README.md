@@ -43,7 +43,7 @@ bash <(curl https://raw.githubusercontent.com/ahmteam/waterwall/main/mux.sh)
 
 ```
 
-Direct (Reality Direct Tunnel)
+### Direct (Reality Direct Tunnel)
 
 ```
 bash <(curl https://raw.githubusercontent.com/69learn/waterwall/main/direct.sh)
