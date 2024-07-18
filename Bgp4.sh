@@ -376,7 +376,7 @@ EOF
 	echo -e "1. ${white} Multiport Iran${rest}"
 	echo -e "2. ${RED} Multiport kharej${rest}"
 	echo -e "0. ${cyan} Back to Main Menu${rest}"
-	echo -en "${Purple} Enter your choice (1-4): ${rest}"
+	echo -en "${Purple} Enter your choice (1-2): ${rest}"
 	read -r choice
 
 	case $choice in
@@ -542,9 +542,9 @@ echo  "
     echo ""
 
 	echo -e "${cyan}1. Bgp4 Tunnel${rest}"
-	echo -e "${cyan}3. Uninstall Waterwall${rest}"
+	echo -e "${cyan}2. Uninstall Waterwall${rest}"
 	echo -e "${White}0. Exit${rest}"
-	echo -en "${Purple}Enter your choice (1-3): ${rest}"
+	echo -en "${Purple}Enter your choice (1-2): ${rest}"
 	read -r choice
 
 	case $choice in
