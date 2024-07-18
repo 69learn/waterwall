@@ -373,8 +373,8 @@ EOF
 		)
 		echo "$json" >/root/Waterwall/config.json
 	}
-	echo -e "3. ${cyan} bgp4 Multiport Iran${rest}"
-	echo -e "4. ${White} bgp4 Multiport kharej${rest}"
+	echo -e "1. ${white} Multiport Iran${rest}"
+	echo -e "2. ${RED} Multiport kharej${rest}"
 	echo -e "0. ${cyan} Back to Main Menu${rest}"
 	echo -en "${Purple} Enter your choice (1-4): ${rest}"
 	read -r choice
