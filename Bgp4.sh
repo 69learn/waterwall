@@ -545,9 +545,6 @@ echo  "
 		bgp4
 		;;
 	2)
-		ssl_cert_issue_main
-		;;
-	3)
 		uninstall_waterwall
 		;;
 	0)
