@@ -381,18 +381,10 @@ EOF
 
 	case $choice in
 	1)
-		create_bgp4_iran
-		waterwall_service
-		;;
-	2)
-		create_bgp4_kharej
-		waterwall_service
-		;;
-	3)
 		create_bgp4_multiport_iran
 		waterwall_service
 		;;
-	4)
+	2)
 		create_bgp4_multiport_kharej
 		waterwall_service
 		;;
