@@ -10,6 +10,7 @@ White='\033[0;96m'
 RED='\033[0;31m'
 BLUE='\033[0;34m'
 MAGENTA='\033[0;35m'
+Green='\033[0;32m'
 NC='\033[0m' # No Color
 
 # Detect the Linux distribution
@@ -502,7 +503,7 @@ check_waterwall_status() {
 	sleep 1
 	# Check the status of the tunnel service
 	if sudo systemctl is-active --quiet Waterwall.service; then
-		echo -e "${cyan}Waterwall Installed successfully :${green} [online ✔] ${rest}"
+		echo -e "${Green}Waterwall Installed successfully :${green} [online ✔] ${rest}"
 		echo -e "${cyan}============================================${rest}"
 	else
 		echo -e "${yellow}Waterwall is not installed or ${red}[offline ✗ ] ${rest}"
