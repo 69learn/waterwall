@@ -402,8 +402,22 @@ EOF
 uninstall_waterwall() {
 	if [ -f ~/Waterwall/config.json ] || [ -f /etc/systemd/system/Waterwall.service ]; then
 		echo -e "${cyan}==============================================${rest}"
-		echo -en "${green}Press Enter to continue${rest}"
+		echo -en "${green}Press Enter to continue, or Ctrl+C to cancel.${rest}"
 		read -r
+		if [ -d ~/Waterwall/cert ] || [ -f ~/.acme/acme.sh ]; then
+			echo -e "${cyan}============================${rest}"
+			echo -en "${green}Do you want to delete the Domain Certificates? (yes/no): ${rest}"
+			read -r delete_cert
+
+			if [[ "$delete_cert" == "yes" ]]; then
+				echo -e "${cyan}============================${rest}"
+				echo -en "${green}Enter Your domain: ${rest}"
+				read -r domain
+
+				rm -rf ~/.acme.sh/"${domain}"_ecc
+				rm -rf ~/Waterwall/cert
+				echo -e "${green}Certificate for ${domain} has been deleted.${rest}"
+			fi
 		fi
 
 		rm -rf ~/Waterwall/{core.json,config.json,Waterwall,log/}
@@ -492,7 +506,7 @@ check_waterwall_status() {
 		echo -e "${Green}Waterwall Installed successfully :${green} [online ✔] ${rest}"
 		echo -e "${Green}============================================${rest}"
 	else
-		echo -e "${RED}Waterwall is not installed or ${red}[offline ✗ ] ${rest}"
+		echo -e "${yellow}Waterwall is not installed or ${red}[offline ✗ ] ${rest}"
 		echo -e "${RED}==============================================${rest}"
 	fi
 }
