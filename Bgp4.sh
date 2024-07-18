@@ -504,10 +504,10 @@ check_waterwall_status() {
 	# Check the status of the tunnel service
 	if sudo systemctl is-active --quiet Waterwall.service; then
 		echo -e "${Green}Waterwall Installed successfully :${green} [online ✔] ${rest}"
-		echo -e "${cyan}============================================${rest}"
+		echo -e "${Green}============================================${rest}"
 	else
 		echo -e "${yellow}Waterwall is not installed or ${red}[offline ✗ ] ${rest}"
-		echo -e "${cyan}==============================================${rest}"
+		echo -e "${RED}==============================================${rest}"
 	fi
 }
 
