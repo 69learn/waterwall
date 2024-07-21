@@ -540,10 +540,9 @@ _/___/________/_/__/_(___(_/_____(_ __/___|/____(___ _(_ __|/_|/__(___/_/_____/_
     echo ""
 
 	echo -e "${cyan}1. Bgp4 Tunnel${rest}"
-	echo -e "${White}2. SSL Certificate Management${rest}"
-	echo -e "${cyan}3. Uninstall Waterwall${rest}"
+	echo -e "${cyan}2. Uninstall Waterwall${rest}"
 	echo -e "${White}0. Exit${rest}"
-	echo -en "${Purple}Enter your choice (1-3): ${rest}"
+	echo -en "${Purple}Enter your choice: ${rest}"
 	read -r choice
 
 	case $choice in
@@ -552,9 +551,6 @@ _/___/________/_/__/_(___(_/_____(_ __/___|/____(___ _(_ __|/_|/__(___/_/_____/_
 		bgp4
 		;;
 	2)
-		ssl_cert_issue_main
-		;;
-	3)
 		uninstall_waterwall
 		;;
 	0)
