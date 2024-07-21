@@ -116,6 +116,190 @@ install_waterwall() {
 		return 0
 	fi
 }
+
+#===================================
+
+#9
+# SSL CERTIFICATE
+install_acme() {
+	cd ~
+	echo -e "${green}install acme...${rest}"
+
+	curl https://get.acme.sh | sh
+	if [ $? -ne 0 ]; then
+		echo -e "${red}install acme failed${rest}"
+		return 1
+	else
+		echo -e "${green}install acme succeed${rest}"
+	fi
+
+	return 0
+}
+
+# SSL Menu
+ssl_cert_issue_main() {
+	echo -e "1. ${cyan} Get SSL Certificate${rest}"
+	echo -e "2. ${White} Revoke${rest}"
+	echo -e "3. ${cyan} Force Renew${rest}"
+	echo -e "0. ${White} Back to Main Menu${rest}"
+	echo -en "${Purple} Enter your choice (1-3): ${rest}"
+	read -r choice
+	case "$choice" in
+	0)
+		main
+		;;
+	1)
+		ssl_cert_issue
+		;;
+	2)
+		local domain=""
+		echo -e "${cyan}============================================${rest}"
+		echo -en "${green}Please enter your domain name to revoke the certificate: ${rest}"
+		read -r domain
+		~/.acme.sh/acme.sh --revoke -d "${domain}"
+		if [ $? -ne 0 ]; then
+			echo -e "${cyan}============================================${rest}"
+			echo -e "${red}Failed to revoke certificate. Please check logs.${rest}"
+		else
+			echo -e "${cyan}============================================${rest}"
+			echo -e "${green}Certificate revoked${rest}"
+		fi
+		;;
+	3)
+		local domain=""
+		echo -e "${cyan}============================================${rest}"
+		echo -en "${green}Please enter your domain name to forcefully renew an SSL certificate: ${rest}"
+		read -r domain
+		~/.acme.sh/acme.sh --renew -d "${domain}" --force
+		if [ $? -ne 0 ]; then
+			echo -e "${cyan}============================================${rest}"
+			echo -e "${red}Failed to renew certificate. Please check logs.${rest}"
+		else
+			echo -e "${cyan}============================================${rest}"
+			echo -e "${green}Certificate renewed${rest}"
+		fi
+		;;
+	*) echo -e "${red}Invalid choice${rest}" ;;
+	esac
+}
+
+ssl_cert_issue() {
+	echo -e "${cyan}============================================${rest}"
+	release=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
+	# check for acme.sh first
+	if [ ! -f ~/.acme.sh/acme.sh ]; then
+		echo -e "${green}acme.sh could not be found. we will install it${rest}"
+		install_acme
+		if [ $? -ne 0 ]; then
+			echo -e "${red}install acme failed, please check logs${rest}"
+			exit 1
+		fi
+	fi
+
+	# install socat second
+	case "${release}" in
+	ubuntu | debian | armbian)
+		apt update -y
+		;;
+	centos | almalinux | rocky | oracle)
+		yum -y update
+		;;
+	fedora)
+		dnf -y update
+		;;
+	arch | manjaro | parch)
+		pacman -Sy --noconfirm socat
+		;;
+	*)
+		echo -e "${red}Unsupported operating system. Please check the script and install the necessary packages manually.${rest}\n"
+		exit 1
+		;;
+	esac
+	if [ $? -ne 0 ]; then
+		echo -e "${red}install socat failed, please check logs${rest}"
+		exit 1
+	else
+		echo -e "${cyan}============================${rest}"
+	fi
+
+	# get the domain here,and we need verify it
+	local domain=""
+	echo -en "${green}Please enter your domain name: ${rest}"
+	read -r domain
+	echo -e "${green}Your domain is:${yellow}${domain}${green},check it...${rest}"
+
+	# check if there already exists a cert
+	local currentCert
+	currentCert=$(~/.acme.sh/acme.sh --list | tail -1 | awk '{print $1}')
+
+	if [ "${currentCert}" == "${domain}" ]; then
+		local certInfo
+		certInfo=$(~/.acme.sh/acme.sh --list)
+		echo -e "${red}system already has certs here,can not issue again,Current certs details:${rest}"
+		echo -e "${green} $certInfo${rest}"
+		exit 1
+	else
+		echo -e "${green} your domain is ready for issuing cert now...${rest}"
+	fi
+
+	# create a directory for install cert
+	certPath="/root/Waterwall/cert"
+	if [ ! -d "$certPath" ]; then
+		mkdir -p "$certPath"
+	else
+		rm -rf "$certPath"
+		mkdir -p "$certPath"
+	fi
+
+	# get needed port here
+	echo -e "${cyan}============================================${rest}"
+	echo -en "${green}Please choose which port you want to use [${yellow}Default: 80${green}]: ${rest}"
+	read -r WebPort
+	WebPort=${WebPort:-80}
+	if [[ ${WebPort} -gt 65535 || ${WebPort} -lt 1 ]]; then
+		echo -e "${red}your input ${WebPort} is invalid,will use default port${rest}"
+		WebPort=80
+	fi
+	echo -e "${green} will use port:${WebPort} to issue certs,please make sure this port is open...${rest}"
+	echo -e "${cyan}============================================${rest}"
+	# issue the cert
+	~/.acme.sh/acme.sh --set-default-ca --server letsencrypt
+	~/.acme.sh/acme.sh --issue -d "${domain}" --listen-v6 --standalone --httpport "${WebPort}"
+	if [ $? -ne 0 ]; then
+		echo -e "${red}issue certs failed,please check logs${rest}"
+		rm -rf ~/.acme.sh/"${domain}"
+		exit 1
+	else
+		echo -e "${yellow}issue certs succeed,installing certs...${rest}"
+	fi
+	# install cert
+	~/.acme.sh/acme.sh --installcert -d "${domain}" \
+		--key-file /root/Waterwall/cert/privkey.pem \
+		--fullchain-file /root/Waterwall/cert/fullchain.pem
+
+	if [ $? -ne 0 ]; then
+		echo -e "${red}install certs failed,exit${rest}"
+		rm -rf ~/.acme.sh/"${domain}"
+		exit 1
+	else
+		echo -e "${green} install certs succeed,enable auto renew...${rest}"
+	fi
+
+	~/.acme.sh/acme.sh --upgrade --auto-upgrade
+	if [ $? -ne 0 ]; then
+		echo -e "${red}auto renew failed, certs details:${rest}"
+		ls -lah "$certPath"/*
+		chmod 755 "$certPath"/*
+		exit 1
+	else
+		echo -e "${green} auto renew succeed, certs details:${rest}"
+		ls -lah "$certPath"/*
+		chmod 755 "$certPath"/*
+	fi
+
+	sudo systemctl restart trojan.service >/dev/null 2>&1
+	sudo systemctl restart Waterwall.service >/dev/null 2>&1
+}
 #===================================
 
 #00
@@ -163,7 +347,7 @@ EOF
 }
 
 #2
-# Bgp4 Tunnel main
+# Bgp4 Tunnel
 bgp4() {
 	create_bgp4_iran() {
 		echo -e "${cyan}============================${rest}"
@@ -373,8 +557,10 @@ EOF
 		)
 		echo "$json" >/root/Waterwall/config.json
 	}
-	echo -e "1. ${white} Multiport Iran${rest}"
-	echo -e "2. ${RED} Multiport kharej${rest}"
+	echo -e "1. ${cyan} bgp4 port to port Iran${rest}"
+	echo -e "2. ${White} bgp4 port to port kharej${rest}"
+	echo -e "3. ${cyan} bgp4 Multiport Iran${rest}"
+	echo -e "4. ${White} bgp4 Multiport kharej${rest}"
 	echo -e "0. ${cyan} Back to Main Menu${rest}"
 	echo -en "${Purple} Enter your choice (1-4): ${rest}"
 	read -r choice
@@ -503,17 +689,25 @@ check_install_service() {
 	fi
 }
 
-
+# Check tunnel status
+check_tunnel_status() {
+	# Check the status of the tunnel service
+	if sudo systemctl is-active --quiet Waterwall.service; then
+		echo -e "${yellow}     Waterwall :${green} [running ✔] ${rest}"
+	else
+		echo -e "${yellow}     Waterwall: ${red} [Not running ✗ ] ${rest}"
+	fi
+}
 
 # Check Waterwall status
 check_waterwall_status() {
 	sleep 1
 	# Check the status of the tunnel service
 	if sudo systemctl is-active --quiet Waterwall.service; then
-		echo -e "${cyan}Waterwall Installed successfully :${green} [online ✔] ${rest}"
+		echo -e "${cyan}Waterwall Installed successfully :${green} [running ✔] ${rest}"
 		echo -e "${cyan}============================================${rest}"
 	else
-		echo -e "${yellow}Waterwall is not installed or ${red}[offline ✗ ] ${rest}"
+		echo -e "${yellow}Waterwall is not installed or ${red}[Not running ✗ ] ${rest}"
 		echo -e "${cyan}==============================================${rest}"
 	fi
 }
@@ -524,27 +718,25 @@ main() {
 	clear
     
 echo  "
- ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄       ▄            ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄        ▄ 
-▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌     ▐░▌          ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░▌      ▐░▌
-▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌     ▐░▌          ▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌▐░█▀▀▀▀▀▀▀█░▌▐░▌░▌     ▐░▌
-▐░▌          ▐░▌       ▐░▌     ▐░▌          ▐░▌          ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌▐░▌    ▐░▌
-▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄█░▌     ▐░▌          ▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄█░▌▐░█▄▄▄▄▄▄▄█░▌▐░▌ ▐░▌   ▐░▌
-▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌     ▐░▌          ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░▌  ▐░▌  ▐░▌
-▐░█▀▀▀▀▀▀▀█░▌ ▀▀▀▀▀▀▀▀▀█░▌     ▐░▌          ▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌▐░█▀▀▀▀█░█▀▀ ▐░▌   ▐░▌ ▐░▌
-▐░▌       ▐░▌          ▐░▌     ▐░▌          ▐░▌          ▐░▌       ▐░▌▐░▌     ▐░▌  ▐░▌    ▐░▌▐░▌
-▐░█▄▄▄▄▄▄▄█░▌ ▄▄▄▄▄▄▄▄▄█░▌     ▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄▄▄ ▐░▌       ▐░▌▐░▌      ▐░▌ ▐░▌     ▐░▐░▌
-▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌     ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░▌       ▐░▌▐░▌       ▐░▌▐░▌      ▐░░▌
- ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀       ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀         ▀  ▀         ▀  ▀        ▀▀ "
+══════════════════════════════════════════════════════════════════════════════════════
+        ____                             _     _                                     
+    ,   /    )                           /|   /                                  /   
+-------/____/---_--_----__---)__--_/_---/-| -/-----__--_/_-----------__---)__---/-__-
+  /   /        / /  ) /   ) /   ) /    /  | /    /___) /   | /| /  /   ) /   ) /(    
+_/___/________/_/__/_(___(_/_____(_ __/___|/____(___ _(_ __|/_|/__(___/_/_____/___\__
+
+══════════════════════════════════════════════════════════════════════════════════════"
 
 	echo ""
-	
+	check_tunnel_status
 	echo ""
     echo ""
 
 	echo -e "${cyan}1. Bgp4 Tunnel${rest}"
-	echo -e "${cyan}2. Uninstall Waterwall${rest}"
+	echo -e "${White}2. SSL Certificate Management${rest}"
+	echo -e "${cyan}3. Uninstall Waterwall${rest}"
 	echo -e "${White}0. Exit${rest}"
-	echo -en "${Purple}Enter your choice (1-2): ${rest}"
+	echo -en "${Purple}Enter your choice (1-3): ${rest}"
 	read -r choice
 
 	case $choice in
