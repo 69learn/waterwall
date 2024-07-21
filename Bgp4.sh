@@ -46,7 +46,7 @@ check_dependencies() {
 
 	for dep in "${dependencies[@]}"; do
 		if ! command -v "${dep}" &>/dev/null; then
-			echo -e "${cyan} ${dep} ${yellow}is not installed. Installing...${rest}"
+			echo -e "${YELLOW} ${dep} ${yellow}is not installed. Installing...${rest}"
 			sudo "${p_m}" install "${dep}" -y
 		fi
 	done
@@ -61,8 +61,8 @@ install_waterwall() {
 	if [ ! -f "$INSTALL_DIR/$FILE_NAME" ]; then
 		check_dependencies
 		echo ""
-		echo -e "${cyan}============================${rest}"
-		echo -e "${cyan}Installing Waterwall...${rest}"
+		echo -e "${YELLOW}============================${rest}"
+		echo -e "${YELLOW}Installing Waterwall...${rest}"
 
 		if [ -z "$LATEST_RELEASE" ]; then
 			echo -e "${red}Failed to get the latest release version.${rest}"
@@ -70,7 +70,7 @@ install_waterwall() {
 			LATEST_RELEASE
 		fi
 
-		echo -e "${cyan}Latest version: ${yellow}${LATEST_RELEASE}${rest}"
+		echo -e "${YELLOW}Latest version: ${yellow}${LATEST_RELEASE}${rest}"
 
 		# Determine the download URL based on the architecture
 		ARCH=$(uname -m)
@@ -112,7 +112,7 @@ install_waterwall() {
 		fi
 
 		echo -e "${green}Waterwall installed successfully in $INSTALL_DIR.${rest}"
-		echo -e "${cyan}============================${rest}"
+		echo -e "${YELLOW}============================${rest}"
 		return 0
 	fi
 }
@@ -128,7 +128,7 @@ create_core_json() {
 	fi
 
 	if [ ! -f ~/Waterwall/core.json ]; then
-		echo -e "${cyan}Creating core.json...${rest}"
+		echo -e "${YELLOW}Creating core.json...${rest}"
 		echo ""
 		cat <<EOF >~/Waterwall/core.json
 {
@@ -168,7 +168,7 @@ EOF
 # Bgp4 Tunnel
 bgp4() {
 	create_bgp4_iran() {
-		echo -e "${cyan}============================${rest}"
+		echo -e "${YELLOW}============================${rest}"
 		echo -en "${green}Enter the local port: ${rest}"
 		read -r local_port
 		echo -en "${green}Enter the remote address: ${rest}"
@@ -217,7 +217,7 @@ EOF
 	}
 
 	create_bgp4_kharej() {
-		echo -e "${cyan}============================${rest}"
+		echo -e "${YELLOW}============================${rest}"
 		echo -en "${green}Enter the local (${yellow}Connection${green}) port [${yellow}Default: 2249${green}]: ${rest}"
 		read -r local_port
 		local_port=${local_port:-2249}
@@ -264,14 +264,14 @@ EOF
 	}
 
 	create_bgp4_multiport_iran() {
-		echo -e "${cyan}============================${rest}"
-		echo -en "${cyan}Enter the starting local port [${yellow}greater than 23${green}]: ${rest}"
+		echo -e "${YELLOW}============================${rest}"
+		echo -en "${YELLOW}Enter the starting local port [${yellow}greater than 23${green}]: ${rest}"
 		read -r start_port
-		echo -en "${cyan}Enter the ending local port [${yellow}less than 65535${green}]: ${rest}"
+		echo -en "${YELLOW}Enter the ending local port [${yellow}less than 65535${green}]: ${rest}"
 		read -r end_port
-		echo -en "${cyan}Enter the remote address: ${rest}"
+		echo -en "${YELLOW}Enter the remote address: ${rest}"
 		read -r remote_address
-		echo -en "${cyan}Enter the remote (${yellow}Connection${green}) port [${yellow}Default: 2249${green}]: ${rest}"
+		echo -en "${YELLOW}Enter the remote (${yellow}Connection${green}) port [${yellow}Default: 2249${green}]: ${rest}"
 		read -r remote_port
 		remote_port=${remote_port:-2249}
 
@@ -323,7 +323,7 @@ EOF
 	}
 
 	create_bgp4_multiport_kharej() {
-		echo -e "${cyan}============================${rest}"
+		echo -e "${YELLOW}============================${rest}"
 		echo -en "${green}Enter the local (${yellow}Connection${green}) port [${yellow}Default: 2249${green}]: ${rest}"
 		read -r local_port
 		local_port=${local_port:-2249}
@@ -375,9 +375,9 @@ EOF
 		)
 		echo "$json" >/root/Waterwall/config.json
 	}
-	echo -e "1. ${cyan} bgp4 Multiport Iran${rest}"
+	echo -e "1. ${YELLOW} bgp4 Multiport Iran${rest}"
 	echo -e "2. ${White} bgp4 Multiport kharej${rest}"
-	echo -e "0. ${cyan} Back to Main Menu${rest}"
+	echo -e "0. ${YELLOW} Back to Main Menu${rest}"
 	echo -en "${Purple} Enter your choice: ${rest}"
 	read -r choice
 
@@ -402,16 +402,16 @@ EOF
 # Uninstall Waterwall
 uninstall_waterwall() {
 	if [ -f ~/Waterwall/config.json ] || [ -f /etc/systemd/system/Waterwall.service ]; then
-		echo -e "${cyan}==============================================${rest}"
+		echo -e "${YELLOW}==============================================${rest}"
 		echo -en "${green}Press Enter to continue, or Ctrl+C to cancel.${rest}"
 		read -r
 		if [ -d ~/Waterwall/cert ] || [ -f ~/.acme/acme.sh ]; then
-			echo -e "${cyan}============================${rest}"
+			echo -e "${YELLOW}============================${rest}"
 			echo -en "${green}Do you want to delete the Domain Certificates? (yes/no): ${rest}"
 			read -r delete_cert
 
 			if [[ "$delete_cert" == "yes" ]]; then
-				echo -e "${cyan}============================${rest}"
+				echo -e "${YELLOW}============================${rest}"
 				echo -en "${green}Enter Your domain: ${rest}"
 				read -r domain
 
@@ -425,13 +425,13 @@ uninstall_waterwall() {
 		systemctl stop Waterwall.service >/dev/null 2>&1
 		systemctl disable Waterwall.service >/dev/null 2>&1
 		rm -rf /etc/systemd/system/Waterwall.service >/dev/null 2>&1
-		echo -e "${cyan}============================${rest}"
+		echo -e "${YELLOW}============================${rest}"
 		echo -e "${green}Waterwall has been uninstalled successfully.${rest}"
-		echo -e "${cyan}============================${rest}"
+		echo -e "${YELLOW}============================${rest}"
 	else
-		echo -e "${cyan}============================${rest}"
+		echo -e "${YELLOW}============================${rest}"
 		echo -e "${red}Waterwall is not installed.${rest}"
-		echo -e "${cyan}============================${rest}"
+		echo -e "${YELLOW}============================${rest}"
 	fi
 }
 
@@ -490,9 +490,9 @@ EOL
 # Check Install service
 check_install_service() {
 	if [ -f /etc/systemd/system/Waterwall.service ]; then
-		echo -e "${cyan}===================================${rest}"
+		echo -e "${YELLOW}===================================${rest}"
 		echo -e "${red}Please uninstall the existing Waterwall service before continuing.${rest}"
-		echo -e "${cyan}===================================${rest}"
+		echo -e "${YELLOW}===================================${rest}"
 		exit 1
 	fi
 }
@@ -512,11 +512,11 @@ check_waterwall_status() {
 	sleep 1
 	# Check the status of the tunnel service
 	if sudo systemctl is-active --quiet Waterwall.service; then
-		echo -e "${cyan}Waterwall Installed successfully :${green} [running ✔] ${rest}"
-		echo -e "${cyan}============================================${rest}"
+		echo -e "${YELLOW}Waterwall Installed successfully :${green} [running ✔] ${rest}"
+		echo -e "${YELLOW}============================================${rest}"
 	else
 		echo -e "${yellow}Waterwall is not installed or ${red}[Not running ✗ ] ${rest}"
-		echo -e "${cyan}==============================================${rest}"
+		echo -e "${YELLOW}==============================================${rest}"
 	fi
 }
 
@@ -543,8 +543,8 @@ echo  "
 	echo ""
     echo ""
 
-	echo -e "${cyan}1. Bgp4 Tunnel${rest}"
-	echo -e "${cyan}2. Uninstall Waterwall${rest}"
+	echo -e "${YELLOW}1. Bgp4 Tunnel${rest}"
+	echo -e "${YELLOW}2. Uninstall Waterwall${rest}"
 	echo -e "${White}0. Exit${rest}"
 	echo -en "${Purple}Enter your choice: ${rest}"
 	read -r choice
@@ -558,7 +558,7 @@ echo  "
 		uninstall_waterwall
 		;;
 	0)
-		echo -e "${cyan}Exit..${rest}"
+		echo -e "${YELLOW}Exit..${rest}"
 		exit
 		;;
 	*)
