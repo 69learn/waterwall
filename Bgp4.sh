@@ -544,8 +544,7 @@ echo  "
     echo ""
 
 	echo -e "${cyan}1. Bgp4 Tunnel${rest}"
-	echo -e "${White}2. SSL Certificate Management${rest}"
-	echo -e "${cyan}3. Uninstall Waterwall${rest}"
+	echo -e "${cyan}2. Uninstall Waterwall${rest}"
 	echo -e "${White}0. Exit${rest}"
 	echo -en "${Purple}Enter your choice (1-3): ${rest}"
 	read -r choice
@@ -555,7 +554,7 @@ echo  "
 		check_install_service
 		bgp4
 		;;
-	3)
+	2)
 		uninstall_waterwall
 		;;
 	0)
