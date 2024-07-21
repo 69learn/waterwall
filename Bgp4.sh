@@ -497,25 +497,17 @@ check_install_service() {
 	fi
 }
 
-# Check tunnel status
-check_tunnel_status() {
-	# Check the status of the tunnel service
-	if sudo systemctl is-active --quiet Waterwall.service; then
-		echo -e "${yellow}     Waterwall :${green} [running ✔] ${rest}"
-	else
-		echo -e "${yellow}     Waterwall: ${red} [Not running ✗ ] ${rest}"
-	fi
-}
+
 
 # Check Waterwall status
 check_waterwall_status() {
 	sleep 1
 	# Check the status of the tunnel service
 	if sudo systemctl is-active --quiet Waterwall.service; then
-		echo -e "${YELLOW}Waterwall Installed successfully :${green} [running ✔] ${rest}"
+		echo -e "${YELLOW}Waterwall Installed successfully${rest}"
 		echo -e "${YELLOW}============================================${rest}"
 	else
-		echo -e "${yellow}Waterwall is not installed or ${red}[Not running ✗ ] ${rest}"
+		echo -e "${yellow}Waterwall is not installed${rest}"
 		echo -e "${YELLOW}==============================================${rest}"
 	fi
 }
