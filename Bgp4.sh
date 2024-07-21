@@ -546,7 +546,7 @@ echo  "
 	echo -e "${cyan}1. Bgp4 Tunnel${rest}"
 	echo -e "${cyan}2. Uninstall Waterwall${rest}"
 	echo -e "${White}0. Exit${rest}"
-	echo -en "${Purple}Enter your choice (1-3): ${rest}"
+	echo -en "${Purple}Enter your choice: ${rest}"
 	read -r choice
 
 	case $choice in
