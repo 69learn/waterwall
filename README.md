@@ -43,7 +43,7 @@ bash <(curl https://raw.githubusercontent.com/ahmteam/waterwall/main/mux.sh)
 
 ```
 
-Bgp4 (multiport)
+### Bgp4 (multiport)
 
 ```
 bash <(curl https://raw.githubusercontent.com/69learn/waterwall/main/Bgp4.sh)
