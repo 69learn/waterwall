@@ -116,10 +116,9 @@ install_waterwall() {
 		return 0
 	fi
 }
-
-
 #===================================
 
+#00
 # Core.json
 create_core_json() {
 	if [ ! -d /root/Waterwall ]; then
@@ -164,7 +163,7 @@ EOF
 }
 
 #2
-# Bgp4 Tunnel
+# Bgp4 Tunnel main
 bgp4() {
 	create_bgp4_iran() {
 		echo -e "${cyan}============================${rest}"
@@ -374,18 +373,26 @@ EOF
 		)
 		echo "$json" >/root/Waterwall/config.json
 	}
-	echo -e "1. ${cyan} bgp4 Multiport Iran${rest}"
-	echo -e "2. ${White} bgp4 Multiport kharej${rest}"
+	echo -e "1. ${white} Multiport Iran${rest}"
+	echo -e "2. ${RED} Multiport kharej${rest}"
 	echo -e "0. ${cyan} Back to Main Menu${rest}"
-	echo -en "${Purple} Enter your choice: ${rest}"
+	echo -en "${Purple} Enter your choice (1-4): ${rest}"
 	read -r choice
 
 	case $choice in
 	1)
-		create_bgp4_multiport_iran
+		create_bgp4_iran
 		waterwall_service
 		;;
 	2)
+		create_bgp4_kharej
+		waterwall_service
+		;;
+	3)
+		create_bgp4_multiport_iran
+		waterwall_service
+		;;
+	4)
 		create_bgp4_multiport_kharej
 		waterwall_service
 		;;
@@ -496,25 +503,17 @@ check_install_service() {
 	fi
 }
 
-# Check tunnel status
-check_tunnel_status() {
-	# Check the status of the tunnel service
-	if sudo systemctl is-active --quiet Waterwall.service; then
-		echo -e "${yellow}     Waterwall :${green} [running ✔] ${rest}"
-	else
-		echo -e "${yellow}     Waterwall: ${red} [Not running ✗ ] ${rest}"
-	fi
-}
+
 
 # Check Waterwall status
 check_waterwall_status() {
 	sleep 1
 	# Check the status of the tunnel service
 	if sudo systemctl is-active --quiet Waterwall.service; then
-		echo -e "${cyan}Waterwall Installed successfully :${green} [running ✔] ${rest}"
+		echo -e "${cyan}Waterwall Installed successfully :${green} [online ✔] ${rest}"
 		echo -e "${cyan}============================================${rest}"
 	else
-		echo -e "${yellow}Waterwall is not installed or ${red}[Not running ✗ ] ${rest}"
+		echo -e "${yellow}Waterwall is not installed or ${red}[offline ✗ ] ${rest}"
 		echo -e "${cyan}==============================================${rest}"
 	fi
 }
@@ -525,25 +524,27 @@ main() {
 	clear
     
 echo  "
-══════════════════════════════════════════════════════════════════════════════════════
-        ____                             _     _                                     
-    ,   /    )                           /|   /                                  /   
--------/____/---_--_----__---)__--_/_---/-| -/-----__--_/_-----------__---)__---/-__-
-  /   /        / /  ) /   ) /   ) /    /  | /    /___) /   | /| /  /   ) /   ) /(    
-_/___/________/_/__/_(___(_/_____(_ __/___|/____(___ _(_ __|/_|/__(___/_/_____/___\__
-
-══════════════════════════════════════════════════════════════════════════════════════"
+ ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄       ▄            ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄        ▄ 
+▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌     ▐░▌          ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░▌      ▐░▌
+▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌     ▐░▌          ▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌▐░█▀▀▀▀▀▀▀█░▌▐░▌░▌     ▐░▌
+▐░▌          ▐░▌       ▐░▌     ▐░▌          ▐░▌          ▐░▌       ▐░▌▐░▌       ▐░▌▐░▌▐░▌    ▐░▌
+▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄█░▌     ▐░▌          ▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄█░▌▐░█▄▄▄▄▄▄▄█░▌▐░▌ ▐░▌   ▐░▌
+▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌     ▐░▌          ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░▌  ▐░▌  ▐░▌
+▐░█▀▀▀▀▀▀▀█░▌ ▀▀▀▀▀▀▀▀▀█░▌     ▐░▌          ▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌▐░█▀▀▀▀█░█▀▀ ▐░▌   ▐░▌ ▐░▌
+▐░▌       ▐░▌          ▐░▌     ▐░▌          ▐░▌          ▐░▌       ▐░▌▐░▌     ▐░▌  ▐░▌    ▐░▌▐░▌
+▐░█▄▄▄▄▄▄▄█░▌ ▄▄▄▄▄▄▄▄▄█░▌     ▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄▄▄ ▐░▌       ▐░▌▐░▌      ▐░▌ ▐░▌     ▐░▐░▌
+▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌     ▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░▌       ▐░▌▐░▌       ▐░▌▐░▌      ▐░░▌
+ ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀       ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀         ▀  ▀         ▀  ▀        ▀▀ "
 
 	echo ""
-	check_tunnel_status
+	
 	echo ""
     echo ""
 
 	echo -e "${cyan}1. Bgp4 Tunnel${rest}"
-	echo -e "${White}2. SSL Certificate Management${rest}"
-	echo -e "${cyan}3. Uninstall Waterwall${rest}"
+	echo -e "${cyan}2. Uninstall Waterwall${rest}"
 	echo -e "${White}0. Exit${rest}"
-	echo -en "${Purple}Enter your choice (1-3): ${rest}"
+	echo -en "${Purple}Enter your choice (1-2): ${rest}"
 	read -r choice
 
 	case $choice in
