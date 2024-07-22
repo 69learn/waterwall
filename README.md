@@ -43,6 +43,15 @@ bash <(curl https://raw.githubusercontent.com/ahmteam/waterwall/main/mux.sh)
 
 ```
 
+- **ویدیوی آموزشی توسط 69**
+<div align="right">
+  <a href="https://youtu.be/iXs3Vo5vu2w?si=xstpADmEl6vakJ3M">
+    <img src="https://github.com/69learn/waterwall/blob/main/src/t.png" alt="Video Title" width="300">
+  </a>
+</div>
+  </details>
+</div>
+
 ### Bgp4 (multiport)
 
 ```
