@@ -64,6 +64,13 @@ bash <(curl https://raw.githubusercontent.com/69learn/waterwall/main/Bgp4.sh)
 
 ```
 
+
+### direct reaality(multiport)
+
+```
+bash <(curl https://raw.githubusercontent.com/69learn/waterwall/main/direct.sh)
+
+```
 ---
 
 [لینک اصلی پروژه](https://github.com/radkesvat/WaterWall)
